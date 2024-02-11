@@ -2,10 +2,10 @@ public class Command
 {
     private char CmdType;
     private boolean isMulti;
-    private short[] writeDataM;
-    private short[] readDataM;
-    private short readData;
-    private short writeData;
+    private boolean read;
+    private boolean usePrev;
+    private short[] dataM;
+    private short data;
     private String WordCMD;
     private int addressStart;
     private int addressEnd;

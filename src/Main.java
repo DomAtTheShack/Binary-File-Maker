@@ -1,13 +1,16 @@
-import javax.jws.soap.SOAPBinding;
 import java.io.*;
 import java.util.Scanner;
 
 public class Main {
     public static int fileSizeKB = 32;
     public static int fileSizeBytes = fileSizeKB * 1024;
+    public static String fileName = "at28c256.bin";
+    public static int prevAddr = 0;
+
     public static void main(String[] args) {
-        String fileName = "at28c256.bin";
         File delete = new File(fileName);
+        CmdInterpreter test = new CmdInterpreter();
+        test.interpretCmd("Set".toLowerCase());
                 String IsDeleted = delete.delete() ?
                         "File " + fileName + " is deleted and new can be written!" :
                         "Error deleting file!";
