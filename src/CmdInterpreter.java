@@ -59,75 +59,120 @@ public class CmdInterpreter
         int addrS;
         int addrE;
         short data;
+        short[] dataA;
         if(cmd.contains("."))
             cmdType = ".";
         else if(cmd.contains(":"))
             cmdType = ":";
         else
             cmdType = " ";
-        for(String c: VALID_CMD_WORD)
+        for(String c: VALID_CMD_WORD) // Check if the cmd is a Word command
         {
-            if(cmd.startsWith(String.valueOf(c.toCharArray()[STARTING_CHAR])))
+            if(cmd.equals(c))
             {
                 tempCmd = cmd.trim();
-                if(tempCmd.contains(" "))
+                if(tempCmd.contains(" ")) // If found trim leading space, then if space is found, grab the argument
                 {
                     argument = (cmd.substring(cmd.indexOf(" "))).split("\\s+");
                     wordCMD = cmd.substring(0, cmd.indexOf(" "));
                 }
-                return new Command(cmd, argument);
+                return new Command(cmd, argument); // Return word cmd with argument if it has one
             }
         }
-        tempCmd = cmd.replace(cmdType," ");
-        String[] temp = tempCmd.split("\\s+");
-        if(temp.length <= 2)
+        tempCmd = cmd.replace(cmdType," ").trim();
+        String[] temp = tempCmd.split("\\s+"); //Replace all key chars ':' or '.' with space
+                                                    // then split string into an array and cut at the space
+        if(temp.length <= 2 || checkStartingChar(cmd.trim())) // Check if the input has one or two parts meaning a cmd like 5F.4B or FF
         {
             isMulti = false;
-            if(temp.length == 2)
-            {
-                if(!tempCmd.startsWith(":") || !tempCmd.startsWith("."))
+            if (!checkStartingChar(cmd)) {
+                usePrev = false;
+                switch (cmdType) // sets all the booleans beforehand
+                // stating that it's not a multi-access and its not anonymous access
                 {
-                    usePrev = false;
-                    switch (cmdType)
-                    {
+                    case ":":
+                        read = false;
+                        addrS = stringToHexToDecimal(temp[0]);
+                        data = (short) stringToHexToDecimal(temp[1]);
+                        return new Command(read, isMulti, cmdType, usePrev, addrS, data); // Return a write Command
+                        // with proper stating address and data to write
+                    case ".":
+                        read = true;
+                        addrS = stringToHexToDecimal(temp[0]);
+                        addrE = stringToHexToDecimal(temp[1]);
+                        return new Command(read, isMulti, cmdType, usePrev, addrS, addrE); // Return a read chunk cmd
+                        // with start and stop address
+                    default:
+                        break;
+                }
+            } else {
+                usePrev = true;
+                if(!checkStartingChar(cmd) || temp.length == 1) {
+                    switch (cmdType) { // Say that you are using the previous value
+                        // and give the proper end address and/or data
                         case ":":
                             read = false;
-                            addrS = stringToHexToDecimal(temp[0]);
-                            data = (short)stringToHexToDecimal(temp[1]);
-                            return new Command(read, isMulti, usePrev, addrS, data);
+                            data = (short) stringToHexToDecimal(temp[0]);
+                            return new Command(read, isMulti, cmdType, usePrev, data);
                         case ".":
                             read = true;
-                            addrS = stringToHexToDecimal(temp[0]);
-                            addrE = stringToHexToDecimal(temp[1]);
-                            return new Command(read, isMulti, usePrev, addrS, addrE);
-                    }
-                }else
-                {
-                    usePrev = true;
-                    switch (cmdType) {
-                        case ":":
-                            read = false;
-                            data = (short) stringToHexToDecimal(temp[1]);
-                            return new Command(read, isMulti, usePrev, data);
-                        case ".":
-                            read = true;
-                            addrE = stringToHexToDecimal(temp[1]);
-                            return new Command(read, isMulti, usePrev, addrE);
+                            addrE = stringToHexToDecimal(temp[0]);
+                            return new Command(read, isMulti, cmdType, usePrev, addrE);
                     }
                 }
-            }else{
+            }
+            if(!checkStartingChar(cmd)) {
+                usePrev = false;
                 read = true;
                 addrS = stringToHexToDecimal(temp[0]);
-                return new Command(read, isMulti, usePrev, addrS);
+                return new Command(read, isMulti, cmdType, usePrev, addrS);
+            }
+            }
+        isMulti = true;
+        if(!cmd.startsWith(":"))
+        { // Multi can only take in a : write or single lookup
+            usePrev = false;
+            read = false;
+            addrS = stringToHexToDecimal(temp[0]);
+            dataA = readInData(temp, usePrev);
+            return new Command(read, isMulti, cmdType, usePrev, addrS, dataA); // Return a write Command
+                // with proper stating address and data to write
+        }else if (cmd.startsWith(".") || cmd.startsWith(":")) // If not do an anonymous multi write
+        {
+            if(cmd.startsWith(":")) {
+                usePrev = true;
+                read = false;
+                dataA = readInData(temp, usePrev);
+                return new Command(read, isMulti, cmdType, usePrev, dataA);
+            }else {
+                usePrev = true;
+                read = true;
+                dataA = readInData(temp, true);
+                return new Command(read, isMulti, cmdType, usePrev, dataA);
             }
         }
-        isMulti = true;
 
-        return new Command();
-
+    usePrev = false;
+    read = true;
+    dataA = readInData(temp, true);
+    return new Command(read, isMulti, cmdType, usePrev, dataA);
     }
     private int stringToHexToDecimal(String hex)
     {
         return Integer.parseInt(hex, 16);
     }
+    private boolean checkStartingChar(@org.jetbrains.annotations.NotNull String tempCmd)
+    {
+        return tempCmd.startsWith(":") || tempCmd.startsWith(".");
+    }
+    private short[] readInData(String[] dataA, boolean anny)
+    {
+        int i = anny ? 0 : 1;
+        short[] shortData = new short[dataA.length];
+        for (i = 0; i < dataA.length; i++) {
+            shortData[i] = (short) stringToHexToDecimal(dataA[i]);
+        }
+        return shortData;
+    }
+
 }

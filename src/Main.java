@@ -10,7 +10,7 @@ public class Main {
     public static void main(String[] args) {
         File delete = new File(fileName);
         CmdInterpreter test = new CmdInterpreter();
-        test.interpretCmd("Set".toLowerCase());
+        Command test2 = (test.interpretCmd(".A2".toLowerCase()));
                 String IsDeleted = delete.delete() ?
                         "File " + fileName + " is deleted and new can be written!" :
                         "Error deleting file!";
