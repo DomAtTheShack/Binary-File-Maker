@@ -134,7 +134,7 @@ public class CmdInterpreter
             usePrev = false;
             read = false;
             addrS = stringToHexToDecimal(temp[0]);
-            dataA = readInData(temp, usePrev);
+            dataA = readInData(temp, false);
             return new Command(read, isMulti, cmdType, usePrev, addrS, dataA); // Return a write Command
                 // with proper stating address and data to write
         }else if (cmd.startsWith(".") || cmd.startsWith(":")) // If not do an anonymous multi write
@@ -165,12 +165,12 @@ public class CmdInterpreter
     {
         return tempCmd.startsWith(":") || tempCmd.startsWith(".");
     }
-    private short[] readInData(String[] dataA, boolean anny)
+    private short[] readInData(String[] dataA, boolean bufferStart)
     {
-        int i = anny ? 0 : 1;
-        short[] shortData = new short[dataA.length];
-        for (i = 0; i < dataA.length; i++) {
-            shortData[i] = (short) stringToHexToDecimal(dataA[i]);
+        int i = bufferStart ? 0 : 1;
+        short[] shortData = new short[dataA.length - i];
+        for (; i < dataA.length; i++) {
+            shortData[i - (bufferStart ? 0 : 1)] = (short) stringToHexToDecimal(dataA[i]);
         }
         return shortData;
     }
