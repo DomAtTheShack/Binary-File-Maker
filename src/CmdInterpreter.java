@@ -12,6 +12,8 @@ public class CmdInterpreter
     public boolean checkBounds(short[] data, int[] addr)
     {
         boolean tempCheck = false;
+        if(data == null)
+            return true;
         for(short size: VALID_SIZES)
         {
             if(size == Main.fileSizeKB)
@@ -22,9 +24,10 @@ public class CmdInterpreter
         }
         if(!tempCheck)
             return false;
-        for(int address: addr)
-        {
-            if (address < 0 || address > Main.fileSizeBytes) {
+        if(addr == null)
+            return true;
+        for (int j : addr) {
+            if ((j < 0 || j > Main.fileSizeBytes)) {
                 return false;
             }
         }
@@ -81,7 +84,35 @@ public class CmdInterpreter
         }
         tempCmd = cmd.replace(cmdType," ").trim();
         String[] temp = tempCmd.split("\\s+"); //Replace all key chars ':' or '.' with space
-                                                    // then split string into an array and cut at the space
+        // then split string into an array and cut at the space
+
+        //Check Bounds of Hex
+        switch (cmdType)
+        {
+            case ":":
+                if(cmd.startsWith(":"))
+                {
+                    if(!checkBounds(readInData(temp, true), null))
+                    {
+                        return null;
+                    }
+                }
+                addrS = stringToHexToDecimal(temp[0]);
+                data = (short) stringToHexToDecimal(temp[1]);
+                if (!checkBounds(new short[]{data}, new int[]{addrS})) {
+                    return null;
+                }
+                break;
+            case ".":
+                if(cmd.startsWith("."))
+                {
+                    if(!checkBounds(null, shortToIntArr(readInData(temp, true)))) {
+                        return null;
+                    }
+                }
+
+        }
+
         if(temp.length <= 2 || checkStartingChar(cmd.trim())) // Check if the input has one or two parts meaning a cmd like 5F.4B or FF
         {
             isMulti = false;
@@ -165,14 +196,22 @@ public class CmdInterpreter
     {
         return tempCmd.startsWith(":") || tempCmd.startsWith(".");
     }
-    private short[] readInData(String[] dataA, boolean bufferStart)
+    private short[] readInData(String[] dataA, boolean noBuffer)
     {
-        int i = bufferStart ? 0 : 1;
+        int i = noBuffer ? 0 : 1;
         short[] shortData = new short[dataA.length - i];
         for (; i < dataA.length; i++) {
-            shortData[i - (bufferStart ? 0 : 1)] = (short) stringToHexToDecimal(dataA[i]);
+            shortData[i - (noBuffer ? 0 : 1)] = (short) stringToHexToDecimal(dataA[i]);
         }
         return shortData;
+    }
+    private int[] shortToIntArr(short[] array)
+    {
+        int[] intArray = new int[array.length];
+        for (int i = 0; i < array.length; i++) {
+            intArray[i] = array[i];
+        }
+        return intArray;
     }
 
 }

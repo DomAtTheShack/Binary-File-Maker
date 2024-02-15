@@ -1,5 +1,6 @@
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.Scanner;
 
 public class TerminalDisplay
 {
@@ -18,6 +19,33 @@ public class TerminalDisplay
     public void println(String disp)
     {
         TERMINAL.println(disp);
+    }
+
+    public void displayLoop(Runnable Loop, CmdInterpreter Inter)
+    {
+        boolean Using = true;
+        Loop = new Runnable() {
+            @Override
+            public void run() {
+                Scanner UserInput = new Scanner(System.in);
+                String CurrentInput;
+                println("JAVAMON V0.1");
+                println("/");
+                while(Using)
+                {
+                    print("$ ");
+                    CurrentInput = UserInput.nextLine();
+                    Command UserCmd = Inter.interpretCmd(CurrentInput);
+                    if(UserCmd != null)
+                    {
+                        UserCmd.Excute();
+                    }else
+                    {
+                        println("Err");
+                    }
+                }
+            }
+        };
     }
     public void clear()
     {

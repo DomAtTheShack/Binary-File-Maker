@@ -9,10 +9,10 @@ class CmdInterpreterTest {
         CmdInterpreter cmdInterpreter = new CmdInterpreter();
 
         // The test input for our method
-        String testInput = "23:FF FE"; // please replace ... with your actual test input
+        String testInput = "23:FF FE FF FE"; // please replace ... with your actual test input
 
         // The output we expect to get from the method when it's working correctly
-        Command expectedOutput = new Command(false, true,":",false,35 ,new short[]{255,254}); // please replace ... with your actual expected output
+        Command expectedOutput = new Command(false, true,":",false,35 ,new short[]{255,254,255,254}); // please replace ... with your actual expected output
 
         // Here we call the method with our test input
         Command result = cmdInterpreter.interpretCmd(testInput);
