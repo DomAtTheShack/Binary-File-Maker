@@ -192,7 +192,7 @@ public class CmdInterpreter
     {
         return Integer.parseInt(hex, 16);
     }
-    private boolean checkStartingChar(@org.jetbrains.annotations.NotNull String tempCmd)
+    private boolean checkStartingChar(String tempCmd)
     {
         return tempCmd.startsWith(":") || tempCmd.startsWith(".");
     }
