@@ -105,4 +105,37 @@ class CmdInterpreterTest {
         // And here we check if the output was as expected
         assertEquals(expectedOutput, result);
     }
+    @Test
+    void interpretCmdNull1() {
+        // For the setup, we create the CmdInterpreter object
+        CmdInterpreter cmdInterpreter = new CmdInterpreter();
+
+        // The test input for our method
+        String testInput = "FF.FE"; // please replace ... with your actual test input
+
+        // The output we expect to get from the method when it's working correctly
+        Command expectedOutput = null;
+        // Here we call the method with our test input
+        Command result = cmdInterpreter.interpretCmd(testInput);
+
+        // And here we check if the output was as expected
+        assertEquals(expectedOutput, result);
+    }
+    @Test
+    void interpretCmdNull2() {
+        // For the setup, we create the CmdInterpreter object
+        CmdInterpreter cmdInterpreter = new CmdInterpreter();
+
+        // The test input for our method
+        String testInput = ".FT"; // please replace ... with your actual test input
+
+        // The output we expect to get from the method when it's working correctly
+        Command expectedOutput = null;
+
+        // Here we call the method with our test input
+        Command result = cmdInterpreter.interpretCmd(testInput);
+
+        // And here we check if the output was as expected
+        assertEquals(expectedOutput, result);
+    }
 }

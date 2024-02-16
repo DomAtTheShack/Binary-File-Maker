@@ -101,10 +101,10 @@ public class Command
         return args;
     }
 
-    public String Excute()
+    /*public String Excute()
     {
 
-    }
+    }*/
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

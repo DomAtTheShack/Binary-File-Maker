@@ -38,7 +38,7 @@ public class TerminalDisplay
                     Command UserCmd = Inter.interpretCmd(CurrentInput);
                     if(UserCmd != null)
                     {
-                        UserCmd.Excute();
+                        //UserCmd.Excute();
                     }else
                     {
                         println("Err");
