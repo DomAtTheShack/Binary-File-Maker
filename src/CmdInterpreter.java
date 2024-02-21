@@ -12,8 +12,7 @@ public class CmdInterpreter
     public boolean checkBounds(short[] data, int[] addr)
     {
         boolean tempCheck = false;
-        if(data == null)
-            return true;
+
         for(short size: VALID_SIZES)
         {
             if(size == Main.fileSizeKB)
@@ -31,12 +30,15 @@ public class CmdInterpreter
                 return false;
             }
         }
-        for(short dataC: data)
-        {
-            if (dataC < 0 || dataC > 255) {
-                return false;
+        if(data != null) {
+            for (short dataC : data) {
+                if (dataC < 0 || dataC > 255) {
+                    return false;
+                }
             }
         }
+        if(data == null)
+            return true;
         return true;
     }
     private boolean validCommand(String cmd)
@@ -113,8 +115,15 @@ public class CmdInterpreter
                         }
                     }
                     dataA = readInData(temp, true);
-                    if (dataA[0] >= dataA[1]) {
-                        return null;
+                    if(dataA.length > 1) {
+                        if (dataA[0] >= dataA[1]) {
+                            return null;
+                        }
+                    }else {
+                        if(!checkBounds(null, new int[]{dataA[0]}))
+                        {
+                            return null;
+                        }
                     }
 
             }
