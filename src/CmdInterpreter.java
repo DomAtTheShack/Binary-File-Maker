@@ -9,7 +9,7 @@ public class CmdInterpreter
     public CmdInterpreter()
     {}
 
-    public boolean checkBounds(short[] data, int[] addr)
+    public boolean checkBounds(int[] data, int[] addr)
     {
         boolean tempCheck = false;
 
@@ -31,7 +31,7 @@ public class CmdInterpreter
             }
         }
         if(data != null) {
-            for (short dataC : data) {
+            for (int dataC : data) {
                 if (dataC < 0 || dataC > 255) {
                     return false;
                 }
@@ -40,6 +40,45 @@ public class CmdInterpreter
         if(data == null)
             return true;
         return true;
+    }
+    public boolean checkBounds(int[] data, boolean isData)
+    {
+        boolean tempCheck = false;
+
+        for(short size: VALID_SIZES)
+        {
+            if(size == Main.fileSizeKB)
+            {
+                tempCheck = true;
+                break;
+            }
+        }
+        if(!tempCheck)
+            return false;
+        if(isData) {
+            if (data != null) {
+                for (int dataC : data) {
+                    if (dataC < 0 || dataC > 255) {
+                        return false;
+                    }
+                }
+            }
+            if (data == null)
+                return true;
+        }else {
+            if(data == null)
+                return true;
+            for (int j : data) {
+                if ((j < 0 || j > Main.fileSizeBytes)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+    public boolean checkBounds(int data)
+    {
+        return (data < 0 || data > Main.fileSizeBytes);
     }
     private boolean validCommand(String cmd)
     {
@@ -66,8 +105,8 @@ public class CmdInterpreter
             String[] argument = null;
             int addrS;
             int addrE;
-            short data;
-            short[] dataA;
+            int data;
+            int[] dataA;
             if (cmd.contains("."))
                 cmdType = ".";
             else if (cmd.contains(":"))
@@ -98,19 +137,19 @@ public class CmdInterpreter
                             return null;
                         }
                     }
-                    addrS = stringToHexToDecimal(temp[0]);
+                    addrS = stringHexToDec(temp[0]);
                     try {
-                        data = (short) stringToHexToDecimal(temp[1]);
+                        data = (short) stringHexToDec(temp[1]);
                     }catch (ArrayIndexOutOfBoundsException ignored) {
                         data = 0;
                     }
-                    if (!checkBounds(new short[]{data}, new int[]{addrS})) {
+                    if (!checkBounds(new int[]{data}, new int[]{addrS})) {
                         return null;
                     }
                     break;
                 case ".":
                     if (cmd.startsWith(".")) {
-                        if (!checkBounds(null, shortToIntArr(readInData(temp, true)))) {
+                        if (!checkBounds(null, readInData(temp, true))) {
                             return null;
                         }
                     }
@@ -125,6 +164,12 @@ public class CmdInterpreter
                             return null;
                         }
                     }
+                    break;
+                case " ":
+                    if(checkBounds(stringHexToDec(temp[0])))
+                    {
+                        return null;
+                    }
 
             }
 
@@ -138,14 +183,14 @@ public class CmdInterpreter
                     {
                         case ":":
                             read = false;
-                            addrS = stringToHexToDecimal(temp[0]);
-                            data = (short) stringToHexToDecimal(temp[1]);
+                            addrS = stringHexToDec(temp[0]);
+                            data = (short) stringHexToDec(temp[1]);
                             return new Command(read, isMulti, cmdType, usePrev, addrS, data); // Return a write Command
                         // with proper stating address and data to write
                         case ".":
                             read = true;
-                            addrS = stringToHexToDecimal(temp[0]);
-                            addrE = stringToHexToDecimal(temp[1]);
+                            addrS = stringHexToDec(temp[0]);
+                            addrE = stringHexToDec(temp[1]);
                             return new Command(read, isMulti, cmdType, usePrev, addrS, addrE); // Return a read chunk cmd
                         // with start and stop address
                         default:
@@ -158,11 +203,11 @@ public class CmdInterpreter
                             // and give the proper end address and/or data
                             case ":":
                                 read = false;
-                                data = (short) stringToHexToDecimal(temp[0]);
+                                data = (short) stringHexToDec(temp[0]);
                                 return new Command(read, isMulti, cmdType, usePrev, data);
                             case ".":
                                 read = true;
-                                addrE = stringToHexToDecimal(temp[0]);
+                                addrE = stringHexToDec(temp[0]);
                                 return new Command(read, isMulti, cmdType, usePrev, addrE);
                         }
                     }
@@ -170,7 +215,7 @@ public class CmdInterpreter
                 if (!checkStartingChar(cmd)) {
                     usePrev = false;
                     read = true;
-                    addrS = stringToHexToDecimal(temp[0]);
+                    addrS = stringHexToDec(temp[0]);
                     return new Command(read, isMulti, cmdType, usePrev, addrS);
                 }
             }
@@ -178,7 +223,7 @@ public class CmdInterpreter
             if (!cmd.startsWith(":")) { // Multi can only take in a : write or single lookup
                 usePrev = false;
                 read = false;
-                addrS = stringToHexToDecimal(temp[0]);
+                addrS = stringHexToDec(temp[0]);
                 dataA = readInData(temp, false);
                 return new Command(read, isMulti, cmdType, usePrev, addrS, dataA); // Return a write Command
                 // with proper stating address and data to write
@@ -206,7 +251,7 @@ public class CmdInterpreter
             return null;
         }
     }
-    private int stringToHexToDecimal(String hex)
+    private int stringHexToDec(String hex)
     {
         return Integer.parseInt(hex, 16);
     }
@@ -214,22 +259,14 @@ public class CmdInterpreter
     {
         return tempCmd.startsWith(":") || tempCmd.startsWith(".");
     }
-    private short[] readInData(String[] dataA, boolean noBuffer)
+    private int[] readInData(String[] dataA, boolean noBuffer)
     {
         int i = noBuffer ? 0 : 1;
-        short[] shortData = new short[dataA.length - i];
+        int[] shortData = new int[dataA.length - i];
         for (; i < dataA.length; i++) {
-            shortData[i - (noBuffer ? 0 : 1)] = (short) stringToHexToDecimal(dataA[i]);
+            shortData[i - (noBuffer ? 0 : 1)] = stringHexToDec(dataA[i]);
         }
         return shortData;
-    }
-    private int[] shortToIntArr(short[] array)
-    {
-        int[] intArray = new int[array.length];
-        for (int i = 0; i < array.length; i++) {
-            intArray[i] = array[i];
-        }
-        return intArray;
     }
 
 }

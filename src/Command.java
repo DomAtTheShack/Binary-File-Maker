@@ -7,7 +7,7 @@ public class Command
     private boolean isMulti;
     private boolean read;
     private boolean usePrev;
-    private short[] dataM;
+    private int[] dataM;
     private int data;
     private String WordCMD = "";
     private int addressStart;
@@ -32,7 +32,7 @@ public class Command
         this.data = dataOrAddress;
     }
     public Command(boolean read, boolean isMulti, String cmdType,
-                   boolean usePrev, int addrS, short[] data)
+                   boolean usePrev, int addrS, int[] data)
     {
         this.read = read;
         this.dataM = data;
@@ -52,7 +52,7 @@ public class Command
         this.data = dataOrAddress;
     }
     public Command(boolean read, boolean isMulti, String cmdType,
-                   boolean usePrev, short[] data)
+                   boolean usePrev, int[] data)
     {
         this.read = read;
         this.isMulti = isMulti;
@@ -77,7 +77,7 @@ public class Command
         return usePrev;
     }
 
-    public short[] getDataM() {
+    public int[] getDataM() {
         return dataM;
     }
 
