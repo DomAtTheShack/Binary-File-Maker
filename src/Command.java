@@ -101,10 +101,45 @@ public class Command
         return args;
     }
 
-    /*public String Excute()
+    public String Excute()
     {
+        if(this.usePrev) {
+            switch (this.CmdType)
+            {
+                case ':':
+                    return writeByte();
+                case '.':
+                    return readBytes();
+            }
+        }else {
+            switch (this.CmdType)
+            {
+                case ':':
+                    return writeByte();
+                case '.':
+                    return readBytes();
+                case ' ':
+                    return readByte();
+            }
+        }
+        return "err";
+    }
 
-    }*/
+    private String writeByte()
+    {
+        return "";
+    }
+    private String readBytes()
+    {
+        return "";
+
+    }
+    private String readByte()
+    {
+        return "";
+
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

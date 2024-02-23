@@ -5,8 +5,9 @@ public class CmdInterpreter
     private final short[] VALID_SIZES = {16,32,64,128,256,512};
 
     private final String[] VALID_CMD_WORD = {"help", "new", "save", "write", "set"};
+    private final String[] VALID_CMD_ARGS = {"n", "s", ""};
 
-    private final byte STARTING_CHAR = 0;
+    private final byte STARTING_VALUE = 0;
 
     public CmdInterpreter()
     {}
@@ -119,14 +120,29 @@ public class CmdInterpreter
             String[] temp = tempCmd.split("\\s+"); //Replace all key chars ':' or '.' with space
             for (String c : VALID_CMD_WORD) // Check if the cmd is a Word command
             {
-                if (temp[STARTING_CHAR].equalsIgnoreCase(c)) {
+                if (temp[STARTING_VALUE].equalsIgnoreCase(c)) {
                     if (temp.length > 1)
                     {
                         for(int i = 1;i<temp.length; i++)
                             argument.add(temp[i].trim().toLowerCase());
 
                     }
-                    wordCMD = temp[STARTING_CHAR];
+                    boolean GoodArg = false;
+                    if(argument.isEmpty())
+                        GoodArg = true;
+                    for(String arg: argument)
+                    {
+                        for(String argRight: VALID_CMD_ARGS)
+                        {
+                            if(arg.equals(argRight))
+                            {
+                                GoodArg = true;
+                            }
+                        }
+                    }
+                    if(!GoodArg)
+                        return null;
+                    wordCMD = temp[STARTING_VALUE];
                     return new Command(wordCMD.toLowerCase(), argument.toArray(new String[]{})); // Return word cmd with argument if it has one
                 }
             }
