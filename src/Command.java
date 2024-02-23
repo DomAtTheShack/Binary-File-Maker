@@ -1,3 +1,4 @@
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -101,8 +102,7 @@ public class Command
         return args;
     }
 
-    public String Excute()
-    {
+    public String Excute() throws IOException {
         if(this.usePrev) {
             switch (this.CmdType)
             {
@@ -125,9 +125,32 @@ public class Command
         return "err";
     }
 
-    private String writeByte()
-    {
-        return "";
+    private String writeByte() throws IOException {
+        StringBuilder Return = new StringBuilder();
+        if(usePrev)
+        {
+            Main.file.seek(Main.prevAddr);
+            Return.append(Main.prevAddr);
+        }else
+        {
+            Main.file.seek(addressStart);
+            Main.prevAddr = addressStart;
+            Return.append(addressStart);
+        }
+        Return.append(CmdType);
+        if(isMulti)
+        {
+            for(int dataInArray: dataM)
+            {
+                Main.file.write(dataInArray);
+                Return.append(dataInArray).append(" ");
+            }
+        }else
+        {
+            Main.file.write(data);
+            Return.append(data);
+        }
+        return Return.toString();
     }
     private String readBytes()
     {

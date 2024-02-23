@@ -38,7 +38,11 @@ public class TerminalDisplay
                     Command UserCmd = Inter.interpretCmd(CurrentInput);
                     if(UserCmd != null)
                     {
-                        UserCmd.Excute();
+                        try {
+                            UserCmd.Excute();
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
                     }else
                     {
                         println("Err");
