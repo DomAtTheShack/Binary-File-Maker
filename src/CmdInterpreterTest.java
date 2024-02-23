@@ -101,4 +101,22 @@ class CmdInterpreterTest {
         Command result = cmdInterpreter.interpretCmd(testInput);
         assertEquals(expectedOutput, result);
     }
+    @Test
+        // This test checks if the method can handle under bound hexadecimal form
+    void interpretCmdWord1() {
+        CmdInterpreter cmdInterpreter = new CmdInterpreter();
+        String testInput = "SET N";
+        Command expectedOutput = new Command("set", new String[]{"n"});
+        Command result = cmdInterpreter.interpretCmd(testInput);
+        assertEquals(expectedOutput, result);
+    }
+    @Test
+        // This test checks if the method can handle under bound hexadecimal form
+    void interpretCmdWord2() {
+        CmdInterpreter cmdInterpreter = new CmdInterpreter();
+        String testInput = "save";
+        Command expectedOutput = new Command("save", new String[]{});
+        Command result = cmdInterpreter.interpretCmd(testInput);
+        assertEquals(expectedOutput, result);
+    }
 }

@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 public class CmdInterpreter
 {
     private final short[] VALID_SIZES = {16,32,64,128,256,512};
@@ -102,7 +104,7 @@ public class CmdInterpreter
             boolean read;
             boolean usePrev;
             String wordCMD;
-            String[] argument = null;
+            ArrayList<String> argument = new ArrayList<>();
             int addrS;
             int addrE;
             int data;
@@ -113,20 +115,22 @@ public class CmdInterpreter
                 cmdType = ":";
             else
                 cmdType = " ";
-            for (String c : VALID_CMD_WORD) // Check if the cmd is a Word command
-            {
-                if (cmd.equals(c)) {
-                    tempCmd = cmd.trim();
-                    if (tempCmd.contains(" ")) // If found trim leading space, then if space is found, grab the argument
-                    {
-                        argument = (cmd.substring(cmd.indexOf(" "))).split("\\s+");
-                        wordCMD = cmd.substring(0, cmd.indexOf(" "));
-                    }
-                    return new Command(cmd, argument); // Return word cmd with argument if it has one
-                }
-            }
             tempCmd = cmd.replace(cmdType, " ").trim();
             String[] temp = tempCmd.split("\\s+"); //Replace all key chars ':' or '.' with space
+            for (String c : VALID_CMD_WORD) // Check if the cmd is a Word command
+            {
+                if (temp[STARTING_CHAR].equalsIgnoreCase(c)) {
+                    if (temp.length > 1)
+                    {
+                        for(int i = 1;i<temp.length; i++)
+                            argument.add(temp[i].trim().toLowerCase());
+
+                    }
+                    wordCMD = temp[STARTING_CHAR];
+                    return new Command(wordCMD.toLowerCase(), argument.toArray(new String[]{})); // Return word cmd with argument if it has one
+                }
+            }
+
             // then split string into an array and cut at the space
 
             //Check Bounds of Hex
