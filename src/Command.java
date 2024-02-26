@@ -144,8 +144,14 @@ public class Command
     }
     private String readBytes()
     {
-        return "";
-
+        if(usePrev)
+        {
+            for(int i = addressStart; i < addressEnd;i++)
+            {
+                return "";
+            }
+        }
+    return "";
     }
     private String readByte()
     {

@@ -20,12 +20,17 @@ public class Main {
     }
 
     public static void main(String[] args) throws IOException {
-        CommandLoop();
+        //CommandLoop();
         File delete = new File(fileName);
-        String IsDeleted = delete.delete() ?
-                        "File " + fileName + " is deleted and new can be written!" :
-                        "Error deleting file!";
-        System.out.println(IsDeleted);
+        //String IsDeleted = delete.delete() ?
+        //                "File " + fileName + " is deleted and new can be written!" :
+        //                "Error deleting file!";
+        //System.out.println(IsDeleted);
+        byte[] temp = new byte[fileSizeBytes];
+
+
+
+        file.close();
 
 
     }
