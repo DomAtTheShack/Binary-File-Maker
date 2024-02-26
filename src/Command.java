@@ -103,15 +103,6 @@ public class Command
     }
 
     public String Excute() throws IOException {
-        if(this.usePrev) {
-            switch (this.CmdType)
-            {
-                case ':':
-                    return writeByte();
-                case '.':
-                    return readBytes();
-            }
-        }else {
             switch (this.CmdType)
             {
                 case ':':
@@ -121,7 +112,6 @@ public class Command
                 case ' ':
                     return readByte();
             }
-        }
         return "err";
     }
 

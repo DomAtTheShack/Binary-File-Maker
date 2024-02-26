@@ -6,6 +6,9 @@ public class Main {
     public static int fileSizeBytes = fileSizeKB * 1024;
     public static String fileName = "at28c256.bin";
     public static int prevAddr = 0;
+    public static String PrgName = "JAVAMON";
+
+    public static float PrgVersion = 0.2f;
     public static RandomAccessFile file;
 
     static {
@@ -23,6 +26,8 @@ public class Main {
                         "File " + fileName + " is deleted and new can be written!" :
                         "Error deleting file!";
         System.out.println(IsDeleted);
+
+
     }
 
     public static void CommandLoop()

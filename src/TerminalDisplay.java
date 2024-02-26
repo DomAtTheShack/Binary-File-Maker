@@ -24,29 +24,26 @@ public class TerminalDisplay
     public void displayLoop(Runnable Loop, CmdInterpreter Inter)
     {
         boolean Using = true;
-        Loop = new Runnable() {
-            @Override
-            public void run() {
-                Scanner UserInput = new Scanner(System.in);
-                String CurrentInput;
-                println("JAVAMON V0.1");
-                println("/");
-                while(Using)
+        Loop = () -> {
+            Scanner UserInput = new Scanner(System.in);
+            String CurrentInput;
+            println(Main.PrgName + " v" + Main.PrgVersion);
+            println("/");
+            while(Using)
+            {
+                print("$ ");
+                CurrentInput = UserInput.nextLine();
+                Command UserCmd = Inter.interpretCmd(CurrentInput);
+                if(UserCmd != null)
                 {
-                    print("$ ");
-                    CurrentInput = UserInput.nextLine();
-                    Command UserCmd = Inter.interpretCmd(CurrentInput);
-                    if(UserCmd != null)
-                    {
-                        try {
-                            UserCmd.Excute();
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
-                    }else
-                    {
-                        println("Err");
+                    try {
+                        UserCmd.Excute();
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
                     }
+                }else
+                {
+                    println("Err");
                 }
             }
         };
