@@ -65,7 +65,12 @@ public class Command
         this.isMulti = isMulti;
         this.CmdType = cmdType.charAt(0);
         this.usePrev = usePrev;
-        this.data = dataOrAddress;
+        if(read && !usePrev)
+            this.addressStart = dataOrAddress;
+        else if(usePrev)
+            this.addressEnd = dataOrAddress;
+        else
+            this.data = dataOrAddress;
     }
     public Command(boolean read, boolean isMulti, String cmdType,
                    boolean usePrev, int[] data)
@@ -79,11 +84,14 @@ public class Command
     public String Excute() throws IOException {
             switch (this.CmdType) {
                 case ':':
-                    return writeByte();
+                    writeByte();
+                    return "";
                 case '.':
-                    return readBytes();
+                    readBytes();
+                    return "";
                 case ' ':
-                    return readByte();
+                    readByte();
+                    return "";
             }
             if(!WordCMD.isEmpty())
                 return WordCmds();
@@ -228,65 +236,61 @@ public class Command
 
     }
 
-    private String writeByte() throws IOException {
-        StringBuilder Return = new StringBuilder();
+    private void writeByte() throws IOException {
         int CurrentAdr;
         if(usePrev)
         {
             Main.file.seek(Main.prevAddr);
             CurrentAdr = Main.prevAddr;
-            Return.append(hex(true, Main.prevAddr));
         }else
         {
             Main.file.seek(addressStart);
             Main.prevAddr = addressStart;
             CurrentAdr = addressStart;
-            Return.append(hex(true, addressStart));
         }
-        Return.append(CmdType).append(" ");
         if(isMulti)
         {
-            for (int dataInArray : dataM) {
-                Return.append(hex(false, Main.file.read())).append(" ");
+            int[] dataT = new int[dataM.length];
+            for (int i = 0; i < dataT.length; i ++) {
+                dataT[i] = Main.file.read();
                 Main.file.seek(CurrentAdr);
                 CurrentAdr ++;
-                Main.file.write(dataInArray);
+                Main.file.write(dataM[i]);
             }
+            DISPLAY.printHexDump(dataT, Main.prevAddr);
         }else
         {
-            Return.append(hex(false, Main.file.read())).append(" ");
+            int[] dataT = new int[1];
+            dataT[0] = Main.file.read();
             Main.file.seek(CurrentAdr);
             Main.file.write(data);
+            DISPLAY.printHexDump(dataT, addressStart);
         }
-        return Return.toString();
     }
-    private String readBytes() throws IOException {
-        StringBuilder Return = new StringBuilder();
+    private void readBytes() throws IOException {
         if(usePrev)
         {
-            Return.append(hex(true, Main.prevAddr)).append(". ");
+            int[] dataT = new int[(addressEnd - Main.prevAddr) + 1];
             Main.file.seek(Main.prevAddr);
-            for(int i = Main.prevAddr; i < addressEnd;i++)
+            for(int i = 0; i < dataT.length;i++)
             {
-                Return.append(hex(false, Main.file.read())).append(" ");
+                dataT[i] = Main.file.read();
             }
+            DISPLAY.printHexDump(dataT, Main.prevAddr);
         }else {
-            Return.append(hex(true, addressStart)).append(". ");
             Main.file.seek(addressStart);
             Main.prevAddr = addressStart;
-            int[] dataT = new int[addressEnd - addressStart];
+            int[] dataT = new int[(addressEnd - addressStart) + 1];
             for (int i = 0; i < dataT.length; i++) {
                  dataT[i] = Main.file.read();
             }
             DISPLAY.printHexDump(dataT, addressStart);
         }
-    return Return.toString();
     }
-    private String readByte() throws IOException {
-        Main.prevAddr = data;
-        Main.file.seek(data);
-        return hex(true, data) + " " + hex(false, Main.file.read());
-
+    private void readByte() throws IOException {
+        Main.prevAddr = addressStart;
+        Main.file.seek(addressStart);
+        DISPLAY.printHexDump(new int[]{Main.file.read()}, addressStart);
     }
 
     private String hex(boolean Address, int hex)

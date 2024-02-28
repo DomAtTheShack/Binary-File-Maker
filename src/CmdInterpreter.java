@@ -97,7 +97,7 @@ public class CmdInterpreter
         try {
 
 
-            if (cmd.isEmpty())
+            if (cmd.trim().isEmpty())
                 return null;
             String cmdType;
             String tempCmd;
@@ -110,12 +110,23 @@ public class CmdInterpreter
             int addrE;
             int data;
             int[] dataA;
+            byte isGood = 0;
             if (cmd.contains("."))
                 cmdType = ".";
             else if (cmd.contains(":"))
                 cmdType = ":";
             else
                 cmdType = " ";
+            for(char Ch: cmd.toCharArray())
+            {
+                if(String.valueOf(Ch).equals(cmdType))
+                {
+                    isGood++;
+                    if(isGood >= 2)
+                        return null;
+                }
+
+            }
             tempCmd = cmd.replace(cmdType, " ").trim();
             String[] temp = tempCmd.split("\\s+"); //Replace all key chars ':' or '.' with space
             for (String c : VALID_CMD_WORD) // Check if the cmd is a Word command
