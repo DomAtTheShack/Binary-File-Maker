@@ -274,9 +274,11 @@ public class Command
             Return.append(hex(true, addressStart)).append(". ");
             Main.file.seek(addressStart);
             Main.prevAddr = addressStart;
-            for (int i = addressStart; i <= addressEnd; i++) {
-                Return.append(hex(false, Main.file.read())).append(" ");
+            int[] dataT = new int[addressEnd - addressStart];
+            for (int i = 0; i < dataT.length; i++) {
+                 dataT[i] = Main.file.read();
             }
+            DISPLAY.printHexDump(dataT, addressStart);
         }
     return Return.toString();
     }

@@ -77,7 +77,7 @@ public class TerminalDisplay
         }
     }
 
-    public void printHexDump(short[] data, int baseAddress) {
+    public void printHexDump(int[] data, int baseAddress) {
         for (int i = 0; i < data.length; i += 8) {
             StringBuilder builder = new StringBuilder();
             builder.append(String.format("%04x  ", baseAddress + i));
