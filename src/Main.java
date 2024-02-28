@@ -11,6 +11,8 @@ public class Main {
     public static float PrgVersion = 0.2f;
     public static RandomAccessFile file;
 
+    public static Boolean isRunning = true;
+
     static {
         try {
             file = new RandomAccessFile(fileName, "rw");
@@ -19,18 +21,17 @@ public class Main {
         }
     }
 
-    public static void main(String[] args) throws IOException {
-        //CommandLoop();
+    public static void main(String[] args) throws IOException, InterruptedException {
+        CommandLoop();
         File delete = new File(fileName);
         //String IsDeleted = delete.delete() ?
         //                "File " + fileName + " is deleted and new can be written!" :
         //                "Error deleting file!";
         //System.out.println(IsDeleted);
         byte[] temp = new byte[fileSizeBytes];
-
-
-
-        file.close();
+        file.write(temp);
+        while(isRunning)
+            Thread.sleep(1000);
 
 
     }

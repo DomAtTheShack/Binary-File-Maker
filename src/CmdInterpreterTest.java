@@ -41,6 +41,15 @@ class CmdInterpreterTest {
         Command result = cmdInterpreter.interpretCmd(testInput);
         assertEquals(expectedOutput, result);
     }
+    @Test
+        // This test checks if the method can interpret simple read command
+    void interpretCmdMR() {
+        CmdInterpreter cmdInterpreter = new CmdInterpreter();
+        String testInput = "FE.FF";
+        Command expectedOutput = new Command(true,false,".", false, 254, 255);
+        Command result = cmdInterpreter.interpretCmd(testInput);
+        assertEquals(expectedOutput, result);
+    }
 
     @Test
         // This test checks if the method can interpret write command in ASCI form

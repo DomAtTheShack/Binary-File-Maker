@@ -23,9 +23,11 @@ public class TerminalDisplay
 
     public void displayLoop(Runnable Loop, CmdInterpreter Inter)
     {
-        boolean Using = true;
         Loop = () -> {
+            boolean Using = true;
             Scanner UserInput = new Scanner(System.in);
+            Command.setDISPLAY(this);
+            Command.setCmdInput(UserInput);
             String CurrentInput;
             println(Main.PrgName + " v" + Main.PrgVersion);
             println("/");
@@ -37,7 +39,15 @@ public class TerminalDisplay
                 if(UserCmd != null)
                 {
                     try {
-                        UserCmd.Excute();
+                        String CurrentCmd = UserCmd.Excute();
+                        if(CurrentCmd.equals("#"))
+                        {
+                            Using = false;
+                            System.out.println("Saving to documents...");
+                        }else
+                        {
+                            System.out.println(CurrentCmd);
+                        }
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }

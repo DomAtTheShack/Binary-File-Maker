@@ -1,6 +1,13 @@
+import java.awt.*;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
+import java.util.Dictionary;
 import java.util.Objects;
+import java.util.Scanner;
 
 public class Command
 {
@@ -14,6 +21,11 @@ public class Command
     private int addressStart;
     private int addressEnd;
     private String[] args = new String[]{};
+
+    private static Scanner CmdInput;
+    private static TerminalDisplay DISPLAY;
+
+    private final String NoChange = "Your file has been left untouched!";
 
 
     public Command(String cmd, String[] argument)
@@ -30,7 +42,10 @@ public class Command
         this.CmdType = cmdType.charAt(0);
         this.usePrev = usePrev;
         this.addressStart = addrS;
-        this.data = dataOrAddress;
+        if(read)
+            this.addressEnd = dataOrAddress;
+        else
+            this.data = dataOrAddress;
     }
     public Command(boolean read, boolean isMulti, String cmdType,
                    boolean usePrev, int addrS, int[] data)
@@ -61,50 +76,8 @@ public class Command
         this.usePrev = usePrev;
         this.dataM = data;
     }
-
-    public char getCmdType() {
-        return CmdType;
-    }
-
-    public boolean isMulti() {
-        return isMulti;
-    }
-
-    public boolean isRead() {
-        return read;
-    }
-
-    public boolean isUsePrev() {
-        return usePrev;
-    }
-
-    public int[] getDataM() {
-        return dataM;
-    }
-
-    public int getData() {
-        return data;
-    }
-
-    public String getWordCMD() {
-        return WordCMD;
-    }
-
-    public int getAddressStart() {
-        return addressStart;
-    }
-
-    public int getAddressEnd() {
-        return addressEnd;
-    }
-
-    public String[] getArgs() {
-        return args;
-    }
-
     public String Excute() throws IOException {
-            switch (this.CmdType)
-            {
+            switch (this.CmdType) {
                 case ':':
                     return writeByte();
                 case '.':
@@ -112,51 +85,214 @@ public class Command
                 case ' ':
                     return readByte();
             }
+            if(!WordCMD.isEmpty())
+                return WordCmds();
+
         return "err";
+    }
+
+    private String WordCmds() throws IOException {
+        switch (WordCMD)
+        {
+            case "help":
+                return HelpCmd();
+            case "new":
+                return MakeNewFile();
+            case "save":
+                return saveFile();
+            case "set":
+                return setCmd(args);
+            case "write":
+                return MiniproWriter.WIP();
+            case "cls":
+                DISPLAY.clear();
+                return "/";
+        }
+        return "err";
+    }
+
+    public static void setCmdInput(Scanner input)
+    {
+        CmdInput = input;
+    }
+    public static void setDISPLAY(TerminalDisplay Disp)
+    {
+        DISPLAY = Disp;
+    }
+    private String setCmd(String[] args)
+    {
+        String Return = "";
+        for(String arg: args)
+        {
+            switch (arg)
+            {
+                case "n":
+                    DISPLAY.print("New file name: ");
+                    String NewName = CmdInput.nextLine();
+                    DISPLAY.println("\nChanging " + Main.fileName + " to " + NewName);
+                    Main.fileName = NewName;
+                    break;
+                case "s":
+                    DISPLAY.print("New size in (4k, 8k, 16k, 32k, 64k, 128k)" +
+                            "\nALL DATA WILL BE LOST type -1 to cancel: ");
+                    try {
+                        int SizeKB = CmdInput.nextInt();
+                        if(SizeKB == -1)
+                            return NoChange;
+                        boolean goodSize = false;
+                        for(int size: CmdInterpreter.VALID_SIZES)
+                        {
+                             if(size == SizeKB) {
+                                 goodSize = true;
+                                 break;
+                             }
+                        }
+                        if(!goodSize)
+                            throw new NumberFormatException();
+                        SizeKB *= 1024;
+                        Main.fileSizeBytes = SizeKB;
+                        Main.file.setLength(SizeKB);
+                        Return = "File size changed to " + SizeKB + "KBs";
+                    }
+                    catch (NumberFormatException e)
+                    {
+                        DISPLAY.println("Invalid size!");
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                    break;
+                case "ct":
+                    Return = "Work in progress";
+                    break;
+                case "":
+                    Return = "You need an Argument";
+                    break;
+            }
+        }
+        return Return;
+    }
+
+    private String saveFile() throws IOException {
+        System.out.println("Do you want to save the file(y/n)");
+        boolean isSaving = Command.CmdInput.nextLine().equals("y");
+        if(isSaving)
+        {
+            Path Documents = Paths.get(System.getProperty("user.home"), "Documents/" + Main.fileName);
+            Path SourceFile = Paths.get(Main.fileName);
+            Main.file.close();
+            Files.move(SourceFile,Documents, StandardCopyOption.REPLACE_EXISTING);
+            Main.isRunning = false;
+            return "#";
+        }
+        return NoChange;
+}
+
+
+    private String MakeNewFile() throws IOException {
+        System.out.println("Do you want to save the file(y/n)");
+        boolean makeNew = Command.CmdInput.nextLine().equals("y");
+        if(makeNew)
+        {
+            Main.file.seek(0);
+            byte[] tempZero = new byte[Main.fileSizeBytes];
+            Main.file.write(tempZero);
+            return "Your file has been erased!";
+        }
+        return NoChange;
+    }
+
+    private String HelpCmd()
+    {
+        return "This program (JAVAMON) simulates the Wozmon program for the 6502 CPU. " +
+                "PS(This is way bigger than 256 bytes and Wozniak would be disappointed) " + "\n Read Single Byte: Address to read -> Ab02 then it will return the byte at the address" +
+                "\n Read Multi Byte: Starting address -> 00FC . <-must have Ending address -> 010F " +
+                "then it will print all bytes between(Inclusive) " +
+                "\n Write Byte: Address to write -> 00FF : <-must have Byte to write(8-bits) -> ff " +
+                "after writing it will print the data .previously at that location" +
+                "\n Multi Write: Address to start writing: 00AB : 00 FA EA CD <- Then multi bytes seperated by a space" +
+                " and then it will write and increment the address so one data byte = one address space" +
+                "\n\n Anonymous access to addresses: Also after running any on the commands above " +
+                "JAVAMON will store the FIRST address location accessed and you can anonymously access it. " +
+                "\n Multi Read Anon: . FFFF <- ''.'' comes first then the address to end the search " +
+                "\n Write Anon: To use this write it like : FF  Start with '':'' then followed by the 8-bit data value" +
+                "\n Multi Write Anon: Same as above but includes multiple bytes : FF FC EA EE 0F 34"+
+                "\n\n New word commands: " +
+                "\n help -> Displays this menu" +
+                "\n new -> Creates a new file" +
+                "\n save -> Will save the file to documents folder" +
+                "\n write -> Work in progress but it will write bin file to Minipro on Linux or Mac based on Chip type" +
+                "\n cls -> Will clear the screen" +
+                "\n set -> Needs an argument set n: Sets name of the file"+
+                "\n set s: Sets the size of the bin file and erases data" +
+                "\n set ct: when the Minipro is working you can use this to set the chip type";
+
     }
 
     private String writeByte() throws IOException {
         StringBuilder Return = new StringBuilder();
+        int CurrentAdr;
         if(usePrev)
         {
             Main.file.seek(Main.prevAddr);
-            Return.append(Main.prevAddr);
+            CurrentAdr = Main.prevAddr;
+            Return.append(hex(true, Main.prevAddr));
         }else
         {
             Main.file.seek(addressStart);
             Main.prevAddr = addressStart;
-            Return.append(addressStart);
+            CurrentAdr = addressStart;
+            Return.append(hex(true, addressStart));
         }
-        Return.append(CmdType);
+        Return.append(CmdType).append(" ");
         if(isMulti)
         {
-            for(int dataInArray: dataM)
-            {
+            for (int dataInArray : dataM) {
+                Return.append(hex(false, Main.file.read())).append(" ");
+                Main.file.seek(CurrentAdr);
+                CurrentAdr ++;
                 Main.file.write(dataInArray);
-                Return.append(dataInArray).append(" ");
             }
         }else
         {
+            Return.append(hex(false, Main.file.read())).append(" ");
+            Main.file.seek(CurrentAdr);
             Main.file.write(data);
-            Return.append(data);
         }
         return Return.toString();
     }
-    private String readBytes()
-    {
+    private String readBytes() throws IOException {
+        StringBuilder Return = new StringBuilder();
         if(usePrev)
         {
-            for(int i = addressStart; i < addressEnd;i++)
+            Return.append(hex(true, Main.prevAddr)).append(". ");
+            Main.file.seek(Main.prevAddr);
+            for(int i = Main.prevAddr; i < addressEnd;i++)
             {
-                return "";
+                Return.append(hex(false, Main.file.read())).append(" ");
+            }
+        }else {
+            Return.append(hex(true, addressStart)).append(". ");
+            Main.file.seek(addressStart);
+            Main.prevAddr = addressStart;
+            for (int i = addressStart; i <= addressEnd; i++) {
+                Return.append(hex(false, Main.file.read())).append(" ");
             }
         }
-    return "";
+    return Return.toString();
     }
-    private String readByte()
-    {
-        return "";
+    private String readByte() throws IOException {
+        Main.prevAddr = data;
+        Main.file.seek(data);
+        return hex(true, data) + " " + hex(false, Main.file.read());
 
+    }
+
+    private String hex(boolean Address, int hex)
+    {
+        if(Address)
+            return String.format("%04x", hex);
+        else
+            return String.format("%02x", hex);
     }
 
     @Override

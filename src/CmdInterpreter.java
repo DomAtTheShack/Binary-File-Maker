@@ -2,10 +2,10 @@ import java.util.ArrayList;
 
 public class CmdInterpreter
 {
-    private final short[] VALID_SIZES = {16,32,64,128,256,512};
+    public static final short[] VALID_SIZES = {4,8,16,32,64,128};
 
-    private final String[] VALID_CMD_WORD = {"help", "new", "save", "write", "set"};
-    private final String[] VALID_CMD_ARGS = {"n", "s", ""};
+    private final String[] VALID_CMD_WORD = {"help", "new", "save", "write", "set", "cls"};
+    private final String[] VALID_CMD_ARGS = {"n", "s", "ct" ,""};
 
     private final byte STARTING_VALUE = 0;
 
