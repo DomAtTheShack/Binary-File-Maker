@@ -29,7 +29,7 @@ public class CmdInterpreter
         if(addr == null)
             return false;
         for (int j : addr) {
-            if ((j <= 0 || j >= Main.fileSizeBytes)) {
+            if ((j < 0 || j >= Main.fileSizeBytes)) {
                 return true;
             }
         }
@@ -52,7 +52,7 @@ public class CmdInterpreter
      */
     public boolean checkBounds(int data)
     {
-        return (data <= 0 || data >= Main.fileSizeBytes);
+        return (data < 0 || data >= Main.fileSizeBytes);
     }
     private boolean validCommand(String cmd)
     {
