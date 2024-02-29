@@ -25,63 +25,34 @@ public class CmdInterpreter
             }
         }
         if(!tempCheck)
-            return false;
-        if(addr == null)
             return true;
+        if(addr == null)
+            return false;
         for (int j : addr) {
-            if ((j < 0 || j > Main.fileSizeBytes)) {
-                return false;
+            if ((j <= 0 || j >= Main.fileSizeBytes)) {
+                return true;
             }
         }
         if(data != null) {
             for (int dataC : data) {
                 if (dataC < 0 || dataC > 255) {
-                    return false;
+                    return true;
                 }
             }
         }
         if(data == null)
-            return true;
-        return true;
-    }
-    public boolean checkBounds(int[] data, boolean isData)
-    {
-        boolean tempCheck = false;
-
-        for(short size: VALID_SIZES)
-        {
-            if(size == Main.fileSizeKB)
-            {
-                tempCheck = true;
-                break;
-            }
-        }
-        if(!tempCheck)
             return false;
-        if(isData) {
-            if (data != null) {
-                for (int dataC : data) {
-                    if (dataC < 0 || dataC > 255) {
-                        return false;
-                    }
-                }
-            }
-            if (data == null)
-                return true;
-        }else {
-            if(data == null)
-                return true;
-            for (int j : data) {
-                if ((j < 0 || j > Main.fileSizeBytes)) {
-                    return false;
-                }
-            }
-        }
-        return true;
+        return false;
     }
+
+    /**
+     * This will check the bounds of the Address sent in to check it and return an according boolean value
+     * @param data The address to be checked to the file size
+     * @return Will return true if the address is out of bounds corresponding to the fileSizeBytes Var
+     */
     public boolean checkBounds(int data)
     {
-        return (data < 0 || data > Main.fileSizeBytes);
+        return (data <= 0 || data >= Main.fileSizeBytes);
     }
     private boolean validCommand(String cmd)
     {
@@ -164,7 +135,7 @@ public class CmdInterpreter
             switch (cmdType) {
                 case ":":
                     if (cmd.startsWith(":")) {
-                        if (!checkBounds(readInData(temp, true), null)) {
+                        if (checkBounds(readInData(temp, true), null)) {
                             return null;
                         }
                     }
@@ -174,23 +145,23 @@ public class CmdInterpreter
                     }catch (ArrayIndexOutOfBoundsException ignored) {
                         data = 0;
                     }
-                    if (!checkBounds(new int[]{data}, new int[]{addrS})) {
+                    if (checkBounds(new int[]{data}, new int[]{addrS})) {
                         return null;
                     }
                     break;
                 case ".":
                     if (cmd.startsWith(".")) {
-                        if (!checkBounds(null, readInData(temp, true))) {
+                        if (checkBounds(null, readInData(temp, true))) {
                             return null;
                         }
                     }
                     dataA = readInData(temp, true);
                     if(dataA.length > 1) {
-                        if (dataA[0] >= dataA[1]) {
+                        if (dataA[0] >= dataA[1] || checkBounds(null, dataA)) {
                             return null;
                         }
                     }else {
-                        if(!checkBounds(null, new int[]{dataA[0]}))
+                        if(checkBounds(null, new int[]{dataA[0]}))
                         {
                             return null;
                         }

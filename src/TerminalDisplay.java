@@ -48,7 +48,7 @@ public class TerminalDisplay
                         {
                             System.out.println(CurrentCmd);
                         }
-                    } catch (IOException e) {
+                    } catch (IOException | InterruptedException e) {
                         throw new RuntimeException(e);
                     }
                 }else

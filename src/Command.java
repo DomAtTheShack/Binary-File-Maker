@@ -1,11 +1,9 @@
-import java.awt.*;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
-import java.util.Dictionary;
 import java.util.Objects;
 import java.util.Scanner;
 
@@ -81,7 +79,7 @@ public class Command
         this.usePrev = usePrev;
         this.dataM = data;
     }
-    public String Excute() throws IOException {
+    public String Excute() throws IOException, InterruptedException {
             switch (this.CmdType) {
                 case ':':
                     writeByte();
@@ -99,7 +97,7 @@ public class Command
         return "err";
     }
 
-    private String WordCmds() throws IOException {
+    private String WordCmds() throws IOException, InterruptedException {
         switch (WordCMD)
         {
             case "help":
@@ -111,12 +109,27 @@ public class Command
             case "set":
                 return setCmd(args);
             case "write":
-                return MiniproWriter.WIP();
+                return writeToMini();
             case "cls":
                 DISPLAY.clear();
                 return "/";
         }
         return "err";
+    }
+
+    private String writeToMini() throws IOException, InterruptedException {
+        if(Main.ChipType == null)
+        {
+            return "Run Set CT to set your chip type";
+        }
+        MiniproWriter CurrentFile = new MiniproWriter(Main.fileName, Main.ChipType);
+        if(CurrentFile.WriteFile())
+        {
+            return ("Write successful");
+        }else
+        {
+            return "Error in writing check chip size, if mini pro is installed, or the chip type";
+        }
     }
 
     public static void setCmdInput(Scanner input)
@@ -291,14 +304,6 @@ public class Command
         Main.prevAddr = addressStart;
         Main.file.seek(addressStart);
         DISPLAY.printHexDump(new int[]{Main.file.read()}, addressStart);
-    }
-
-    private String hex(boolean Address, int hex)
-    {
-        if(Address)
-            return String.format("%04x", hex);
-        else
-            return String.format("%02x", hex);
     }
 
     @Override
