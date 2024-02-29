@@ -54,15 +54,7 @@ public class CmdInterpreter
     {
         return (data < 0 || data >= Main.fileSizeBytes);
     }
-    private boolean validCommand(String cmd)
-    {
-        for (String command : VALID_CMD_WORD) {
-            if (command.equals(cmd)) {
-                return true;
-            }
-        }
-        return false;
-    }
+
     public Command interpretCmd(String cmd)
     {
         try {

@@ -183,10 +183,12 @@ public class Command
                     }
                     break;
                 case "ct":
-                    Return = "Work in progress";
+                    DISPLAY.print("What to change Chip type to: ");
+                    Main.ChipType = CmdInput.nextLine();
+                    Return = "Changed Chip type to " + Main.ChipType;
                     break;
-                case "":
-                    Return = "You need an Argument";
+                default:
+                    Return = "You need an Argument or a proper one \n Type help to see available options";
                     break;
             }
         }

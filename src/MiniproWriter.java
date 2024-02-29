@@ -20,7 +20,7 @@ public class MiniproWriter
     {
         if(OS.contains("unix") || OS.contains("linux")) {
             String projectPath = System.getProperty("user.dir");
-            ProcessBuilder processBuilder = new ProcessBuilder("minipro", "-p " + ChipType, "-w ", FileName);
+            ProcessBuilder processBuilder = new ProcessBuilder("minipro", "-p" + ChipType, "-w", FileName);
             processBuilder.directory(new File(projectPath));
             processBuilder.redirectErrorStream(true); // Redirect error stream to standard output
             Process process = processBuilder.inheritIO().start();
