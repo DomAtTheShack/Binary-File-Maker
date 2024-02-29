@@ -29,6 +29,7 @@ public class TerminalDisplay
             Command.setDISPLAY(this);
             Command.setCmdInput(UserInput);
             String CurrentInput;
+            clear();
             println(Main.PrgName + " v" + Main.PrgVersion);
             println("/");
             while(Using)

@@ -7,7 +7,7 @@ public class Main {
     public static String fileName = "at28c256.bin";
     public static int prevAddr = 0;
     public static String PrgName = "JAVAMON";
-    public static float PrgVersion = 0.2f;
+    public static float PrgVersion = 0.8f;
     public static String ChipType;
     public static RandomAccessFile file;
 
