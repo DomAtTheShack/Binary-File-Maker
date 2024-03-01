@@ -28,33 +28,40 @@ public class TerminalDisplay
             Scanner UserInput = new Scanner(System.in);
             Command.setDISPLAY(this);
             Command.setCmdInput(UserInput);
+            boolean printDollar = true;
             String CurrentInput;
             clear();
             println(Main.PrgName + " v" + Main.PrgVersion);
             println("/");
             while(Using)
             {
-                print("$ ");
+                if(printDollar)
+                    System.out.print("$ ");
+                printDollar = true;
                 CurrentInput = UserInput.nextLine();
-                Command UserCmd = Inter.interpretCmd(CurrentInput);
-                if(UserCmd != null)
-                {
-                    try {
-                        String CurrentCmd = UserCmd.Excute();
-                        if(CurrentCmd.equals("#"))
-                        {
-                            Using = false;
-                            System.out.println("Saving to documents...");
-                        }else
-                        {
-                            System.out.println(CurrentCmd);
+                if (!CurrentInput.trim().isEmpty()) {
+                    Command UserCmd = Inter.interpretCmd(CurrentInput);
+                    if(UserCmd != null)
+                    {
+                        try {
+                            String CurrentCmd = UserCmd.Excute();
+                            if(CurrentCmd.equals("#"))
+                            {
+                                Using = false;
+                                System.out.println("Saving to documents...");
+                            }else
+                            {
+                                System.out.println(CurrentCmd);
+                            }
+                        } catch (IOException | InterruptedException e) {
+                            throw new RuntimeException(e);
                         }
-                    } catch (IOException | InterruptedException e) {
-                        throw new RuntimeException(e);
+                    }else
+                    {
+                        System.out.println("Err");
                     }
-                }else
-                {
-                    println("Err");
+                }else{
+                    printDollar = false;
                 }
             }
         };

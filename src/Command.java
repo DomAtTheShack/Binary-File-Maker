@@ -140,8 +140,7 @@ public class Command
     {
         DISPLAY = Disp;
     }
-    private String setCmd(String[] args)
-    {
+    private String setCmd(String[] args) throws IOException {
         String Return = "";
         for(String arg: args)
         {
@@ -150,6 +149,8 @@ public class Command
                 case "n":
                     DISPLAY.print("New file name: ");
                     String NewName = CmdInput.nextLine();
+                    Path Rename = Paths.get(Main.fileName);
+                    Files.move(Rename, Paths.get(NewName), StandardCopyOption.REPLACE_EXISTING);
                     DISPLAY.println("\nChanging " + Main.fileName + " to " + NewName);
                     Main.fileName = NewName;
                     break;
