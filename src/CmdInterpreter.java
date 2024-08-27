@@ -249,10 +249,12 @@ public class CmdInterpreter
     {
         return Integer.parseInt(hex, 16);
     }
+
     private boolean checkStartingChar(String tempCmd)
     {
         return tempCmd.startsWith(":") || tempCmd.startsWith(".");
     }
+
     private int[] readInData(String[] dataA, boolean noBuffer)
     {
         int i = noBuffer ? 0 : 1;
